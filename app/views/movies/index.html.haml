@@ -15,9 +15,11 @@
 %table#movies
   %thead
     %tr
-      %th{:class => @title_header}= sortable "title","Movie Title"
+      %th{class: was_highlighted?('title')}
+        = sortable "title","Movie Title"
       %th Rating
-      %th{:class => @title_header}= sortable "release_date","Release Date"
+      %th{class: was_highlighted?('release_date')}
+        = sortable "release_date","Release Date"
       %th More Info
   %tbody
     - @movies.each do |movie|

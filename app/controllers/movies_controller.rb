@@ -8,12 +8,7 @@ class MoviesController < ApplicationController
   end
 
   def index
-    #@movies = Movie.all
-    #OLD
     #@movies = Movie.order(sort_column + " " + sort_direction)
-    #sort_column = sort_column()
-    #sort_direction = sort_direction()
-    #sort = params[:sort] || session[:sort]
     case sort_column
     when 'title'
       ordering,@title_header = {:order => :title}, 'hilite'
@@ -27,7 +22,7 @@ class MoviesController < ApplicationController
       @selected_ratings = Hash[@all_ratings.map {|rating| [rating, rating]}]
     end
 
-    # Set the session variables if necessary
+    # Set the session variables if necessary and redirect as necessary
     if params[:sort_column] != session[:sort_column] or params[:ratings] != session[:ratings] or params[:sort_direction] != session[:sort_direction]
       session[:sort_column] = sort_column
       session[:sort_direction] = sort_direction
@@ -35,7 +30,7 @@ class MoviesController < ApplicationController
       redirect_to :sort_column => sort_column, :sort_direction => sort_direction, :ratings => @selected_ratings and return
     end
 
-    @movies = Movie.find_all_by_rating(@selected_ratings.keys, sort_column + " " + sort_direction)
+    @movies = Movie.find_all_by_rating(@selected_ratings.keys, :order => sort_column + " " + sort_direction)
   end
 
   def new
