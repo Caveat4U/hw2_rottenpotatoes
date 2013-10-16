@@ -9,7 +9,33 @@ class MoviesController < ApplicationController
 
   def index
     #@movies = Movie.all
-    @movies = Movie.order(sort_column + " " + sort_direction)
+    #OLD
+    #@movies = Movie.order(sort_column + " " + sort_direction)
+    #sort_column = sort_column()
+    #sort_direction = sort_direction()
+    #sort = params[:sort] || session[:sort]
+    case sort_column
+    when 'title'
+      ordering,@title_header = {:order => :title}, 'hilite'
+    when 'release_date'
+      ordering,@date_header = {:order => :release_date}, 'hilite'
+    end
+    @all_ratings = Movie.all_ratings
+    @selected_ratings = params[:ratings] || session[:ratings] || {}
+
+    if @selected_ratings == {}
+      @selected_ratings = Hash[@all_ratings.map {|rating| [rating, rating]}]
+    end
+
+    # Set the session variables if necessary
+    if params[:sort_column] != session[:sort_column] or params[:ratings] != session[:ratings] or params[:sort_direction] != session[:sort_direction]
+      session[:sort_column] = sort_column
+      session[:sort_direction] = sort_direction
+      session[:ratings] = @selected_ratings
+      redirect_to :sort_column => sort_column, :sort_direction => sort_direction, :ratings => @selected_ratings and return
+    end
+
+    @movies = Movie.find_all_by_rating(@selected_ratings.keys, sort_column + " " + sort_direction)
   end
 
   def new
@@ -41,11 +67,13 @@ class MoviesController < ApplicationController
   end
   
   def sort_column
-    Movie.column_names.include?(params[:sort]) ? params[:sort] : "title"
+    sort = params[:sort_column] || session[:sort_column]
+    Movie.column_names.include?(sort) ? sort : "title"
   end
 
   def sort_direction
-    %w[asc desc].include?(params[:direction]) ? params[:direction] : "asc"
+    direction = params[:sort_direction] || session[:sort_direction]
+    %w[asc desc].include?(direction) ? direction : "asc"
   end
 
 end

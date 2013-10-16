@@ -2,12 +2,22 @@
 -#  <th><%= sortable "title" %></th>
 %h1 All Movies
 
+= form_tag movies_path, :method => :get, :id => 'ratings_form' do
+  = hidden_field_tag "title_sort", true if @title_header
+  = hidden_field_tag ":release_date_sort", true if @date_header
+  Include:
+  - @all_ratings.each do |rating|
+    = rating
+    = check_box_tag "ratings[#{rating}]", 1, @selected_ratings.include?(rating), :id => "ratings_#{rating}"
+  = submit_tag 'Refresh', :id => 'ratings_submit'
+
+
 %table#movies
   %thead
     %tr
-      %th= sortable "title","Movie Title"
+      %th{:class => @title_header}= sortable "title","Movie Title"
       %th Rating
-      %th= sortable "release_date","Release Date"
+      %th{:class => @title_header}= sortable "release_date","Release Date"
       %th More Info
   %tbody
     - @movies.each do |movie|
