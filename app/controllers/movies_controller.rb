@@ -27,6 +27,7 @@ class MoviesController < ApplicationController
       session[:sort_column] = sort_column
       session[:sort_direction] = sort_direction
       session[:ratings] = @selected_ratings
+      flash.keep
       redirect_to :sort_column => sort_column, :sort_direction => sort_direction, :ratings => @selected_ratings and return
     end
 
